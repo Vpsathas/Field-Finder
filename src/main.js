@@ -48,21 +48,30 @@ async function fetchFacilities(sport = '') {
   return res.json();
 }
 
-function renderList(list) {
+function renderList(items) {
   const ul = document.getElementById('facility-list');
   ul.innerHTML = '';
-  list.forEach((f) => {
-    const status = f.computedStatus || f.status || 'unknown';
+  items.forEach((item) => {
     const li = document.createElement('li');
     li.className = 'facility-item';
-    const sport = f.computedSport || f.sport || 'other';
-    li.innerHTML = `
-      <strong>${escapeHtml(f.name)}</strong>
-      <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>
-      <span class="sport">${sportLabels[sport] || sport}</span>
-    `;
-    li.dataset.id = f.id;
-    li.addEventListener('click', () => openModal(f));
+    if (item.type === 'single') {
+      const f = item.facility;
+      const status = f.computedStatus || f.status || 'unknown';
+      const sport = f.computedSport || f.sport || 'other';
+      li.innerHTML = `
+        <strong>${escapeHtml(f.name)}</strong>
+        <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>
+        <span class="sport">${sportLabels[sport] || sport}</span>
+      `;
+      li.addEventListener('click', () => openModal(f));
+    } else {
+      const c = item;
+      li.innerHTML = `
+        <strong>${escapeHtml(c.name)}</strong>
+        <span class="sport">${c.facilityCount} fields</span>
+      `;
+      li.addEventListener('click', () => openComplexModal(c));
+    }
     ul.appendChild(li);
   });
 }
@@ -73,19 +82,39 @@ function escapeHtml(s) {
   return div.innerHTML;
 }
 
-function updateMap(list) {
+function updateMap(items) {
   markersLayer.clearLayers();
   const pinIcon = getRedPinIcon();
-  list.forEach((f) => {
-    const marker = L.marker([f.lat, f.lng], { icon: pinIcon })
-      .on('click', () => openModal(f));
-    marker.facility = f;
-    markersLayer.addLayer(marker);
+  items.forEach((item) => {
+    if (item.type === 'single') {
+      const f = item.facility;
+      const marker = L.marker([f.lat, f.lng], { icon: pinIcon })
+        .on('click', () => openModal(f));
+      marker.facility = f;
+      markersLayer.addLayer(marker);
+    } else {
+      const c = item;
+      const marker = L.marker([c.lat, c.lng], { icon: pinIcon })
+        .on('click', () => openComplexModal(c));
+      marker.complex = c;
+      markersLayer.addLayer(marker);
+    }
   });
+}
+
+function showSingleModal() {
+  document.getElementById('modal-single').classList.remove('hidden');
+  document.getElementById('modal-complex').classList.add('hidden');
+}
+
+function showComplexModal() {
+  document.getElementById('modal-single').classList.add('hidden');
+  document.getElementById('modal-complex').classList.remove('hidden');
 }
 
 function openModal(f) {
   const modal = document.getElementById('modal');
+  showSingleModal();
   const status = f.computedStatus || f.status || 'unknown';
   document.getElementById('modal-title').textContent = f.name;
   document.getElementById('modal-status').innerHTML = `Status: <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>`;
@@ -103,6 +132,31 @@ function openModal(f) {
   });
 }
 
+function openComplexModal(complex) {
+  const modal = document.getElementById('modal');
+  showComplexModal();
+  document.getElementById('modal-complex-title').textContent = complex.name;
+  const listEl = document.getElementById('modal-complex-list');
+  listEl.innerHTML = '';
+  complex.facilities.forEach((f) => {
+    const status = f.computedStatus || f.status || 'unknown';
+    const sport = f.computedSport || f.sport || 'other';
+    const li = document.createElement('li');
+    li.className = 'modal-complex-item';
+    li.innerHTML = `
+      <strong>${escapeHtml(f.name)}</strong>
+      <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>
+      <span class="sport">${sportLabels[sport] || sport}</span>
+    `;
+    li.addEventListener('click', () => {
+      openModal(f);
+    });
+    listEl.appendChild(li);
+  });
+  modal.dataset.facilityId = '';
+  modal.classList.remove('hidden');
+}
+
 function reportStatus(id, status) {
   fetch(`${API}/facilities/${id}/status`, {
     method: 'PUT',
@@ -111,8 +165,6 @@ function reportStatus(id, status) {
   })
     .then((r) => r.json())
     .then((updated) => {
-      const idx = facilities.findIndex((f) => f.id === id);
-      if (idx >= 0) facilities[idx] = { ...facilities[idx], ...updated };
       const modal = document.getElementById('modal');
       if (modal.dataset.facilityId === id) {
         document.getElementById('modal-status').innerHTML = `Status: <span class="badge ${statusClass[updated.computedStatus]}">${statusLabels[updated.computedStatus]}</span>`;
@@ -158,24 +210,31 @@ function init() {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         const { latitude, longitude } = pos.coords;
-        fetch(`${API}/discovery/osm?lat=${latitude}&lng=${longitude}&radiusKm=3`)
-          .then((r) => r.json())
+        fetch(`${API}/discovery/osm?lat=${latitude}&lng=${longitude}&radiusKm=5`)
+          .then((r) => {
+            if (!r.ok) throw new Error(r.status === 502 ? 'Map data service unavailable. Try again in a moment.' : 'Discovery failed.');
+            return r.json();
+          })
           .then((data) => {
             btn.disabled = false;
             btn.textContent = 'Discover nearby';
+            document.getElementById('filter-sport').value = '';
             refresh();
-            if (data.discovered > 0) alert(`Added ${data.discovered} facilities from OpenStreetMap.`);
+            map.flyTo([latitude, longitude], 14, { duration: 0.8 });
+            const n = data.discovered != null ? data.discovered : 0;
+            if (n > 0) alert(`Added ${n} facilities. Map updated.`);
+            else alert('No new facilities in this area. Showing existing pins.');
           })
-          .catch(() => {
+          .catch((err) => {
             btn.disabled = false;
             btn.textContent = 'Discover nearby';
-            alert('Discovery failed. Try again.');
+            alert(err.message || 'Discovery failed. Try again.');
           });
       },
       () => {
         btn.disabled = false;
         btn.textContent = 'Discover nearby';
-        alert('Could not get your location.');
+        alert('Could not get your location. Allow location access and try again.');
       }
     );
   });

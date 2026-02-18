@@ -6,11 +6,13 @@ import {
   computeStatus,
   getSport,
 } from '../store.js';
+import { groupFacilities } from '../groupFacilities.js';
 
 export const facilitiesRouter = Router();
 
 facilitiesRouter.get('/', (req, res) => {
   const sport = req.query.sport;
+  const flat = req.query.flat === 'true';
   let list = getAllFacilities().map((f) => {
     const computedSport = getSport(f);
     return {
@@ -21,7 +23,12 @@ facilitiesRouter.get('/', (req, res) => {
     };
   });
   if (sport) list = list.filter((f) => (f.computedSport || f.sport) === sport);
-  res.json(list);
+  if (flat) {
+    res.json(list);
+    return;
+  }
+  const items = groupFacilities(list);
+  res.json(items);
 });
 
 facilitiesRouter.get('/:id', (req, res) => {

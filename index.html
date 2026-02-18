@@ -51,19 +51,26 @@
       <div id="modal" class="modal hidden">
         <div class="modal-content">
           <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
-          <h2 id="modal-title">Facility</h2>
-          <p id="modal-status" class="modal-status"></p>
-          <p id="modal-hours" class="modal-meta"></p>
-          <div class="modal-actions">
-            <p>Report current status:</p>
-            <div class="status-buttons">
-              <button type="button" data-status="open">Open</button>
-              <button type="button" data-status="closed">Closed</button>
-              <button type="button" data-status="in_use">In use</button>
-              <button type="button" data-status="unknown">Unknown</button>
+          <div id="modal-single">
+            <h2 id="modal-title">Facility</h2>
+            <p id="modal-status" class="modal-status"></p>
+            <p id="modal-hours" class="modal-meta"></p>
+            <div class="modal-actions">
+              <p>Report current status:</p>
+              <div class="status-buttons">
+                <button type="button" data-status="open">Open</button>
+                <button type="button" data-status="closed">Closed</button>
+                <button type="button" data-status="in_use">In use</button>
+                <button type="button" data-status="unknown">Unknown</button>
+              </div>
             </div>
+            <p id="modal-links" class="modal-links"></p>
           </div>
-          <p id="modal-links" class="modal-links"></p>
+          <div id="modal-complex" class="hidden">
+            <h2 id="modal-complex-title"></h2>
+            <p class="modal-meta">Click a field to see details or report status.</p>
+            <ul id="modal-complex-list" class="modal-complex-list"></ul>
+          </div>
         </div>
       </div>
     </div>

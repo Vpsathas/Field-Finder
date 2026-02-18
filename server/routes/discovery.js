@@ -26,7 +26,7 @@ export const discoveryRouter = Router();
 discoveryRouter.get('/osm', async (req, res) => {
   const lat = parseFloat(req.query.lat);
   const lng = parseFloat(req.query.lng);
-  const radiusKm = Math.min(parseFloat(req.query.radiusKm) || 3, 10);
+  const radiusKm = Math.min(parseFloat(req.query.radiusKm) || 5, 10);
   if (Number.isNaN(lat) || Number.isNaN(lng)) {
     return res.status(400).json({ error: 'lat and lng query params required' });
   }
@@ -57,6 +57,10 @@ discoveryRouter.get('/osm', async (req, res) => {
       body: query,
       headers: { 'Content-Type': 'text/plain' },
     });
+    if (!r.ok) {
+      const text = await r.text();
+      throw new Error(`Overpass API error ${r.status}: ${text.slice(0, 100)}`);
+    }
     const data = await r.json();
     const existing = getAllFacilities();
     const existingKeys = new Set(existing.map((f) => `${f.lat.toFixed(5)}-${f.lng.toFixed(5)}`));

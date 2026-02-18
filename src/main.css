@@ -399,6 +399,50 @@ html, body {
   text-decoration: underline;
 }
 
+#modal-complex.hidden {
+  display: none;
+}
+
+.modal-complex-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.modal-complex-item {
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.35rem;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.modal-complex-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.modal-complex-item strong {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.modal-complex-item .badge {
+  margin-right: 0.5rem;
+}
+
+.modal-complex-item .sport {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
 @media (max-width: 768px) {
   #app {
     grid-template-columns: 1fr;
