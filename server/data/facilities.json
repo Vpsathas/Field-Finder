@@ -4107,5 +4107,35 @@
     "statusUpdatedAt": null,
     "statusSource": null,
     "createdAt": "2026-02-13T20:52:21.821Z"
+  },
+  {
+    "id": "1771446285137z5pzlo",
+    "name": "baseball",
+    "type": "field",
+    "sport": "baseball",
+    "lat": 30.2457673,
+    "lng": -97.7110738,
+    "openingHours": null,
+    "externalUrl": null,
+    "webcamUrl": null,
+    "status": null,
+    "statusUpdatedAt": null,
+    "statusSource": null,
+    "createdAt": "2026-02-18T20:24:45.137Z"
+  },
+  {
+    "id": "177144628977947vlz2",
+    "name": "golf",
+    "type": "field",
+    "sport": "other",
+    "lat": 30.2882753,
+    "lng": -97.7743804,
+    "openingHours": null,
+    "externalUrl": null,
+    "webcamUrl": null,
+    "status": null,
+    "statusUpdatedAt": null,
+    "statusSource": null,
+    "createdAt": "2026-02-18T20:24:49.779Z"
   }
 ]

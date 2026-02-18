@@ -132,7 +132,7 @@ function refresh() {
 }
 
 function initMap() {
-  map = L.map('map').setView([40.78, -73.97], 12);
+  map = L.map('map').setView([30.2672, -97.7431], 12);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
