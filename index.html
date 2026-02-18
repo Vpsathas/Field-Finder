@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sports Field Check — Open or In Use?</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="/src/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>Sports Field Check</h1>
+        <p class="tagline">See if fields, courts & tracks are open before you go</p>
+      </header>
+      <aside class="sidebar">
+        <div class="filters">
+          <label>Sport</label>
+          <select id="filter-sport">
+            <option value="">All sports</option>
+            <option value="soccer">Soccer</option>
+            <option value="basketball">Basketball</option>
+            <option value="track_and_field">Track and field</option>
+            <option value="volleyball">Volleyball</option>
+            <option value="football">Football</option>
+            <option value="tennis">Tennis</option>
+            <option value="baseball">Baseball</option>
+            <option value="softball">Softball</option>
+            <option value="pickleball">Pickleball</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="discover">
+          <p>Discover facilities near you (OpenStreetMap)</p>
+          <button type="button" id="btn-discover">Discover nearby</button>
+        </div>
+        <ul id="facility-list" class="facility-list"></ul>
+      </aside>
+      <main class="map-container">
+        <div id="map"></div>
+        <div id="map-legend" class="legend">
+          <span class="badge open">Open</span>
+          <span class="badge closed">Closed</span>
+          <span class="badge in_use">In use</span>
+          <span class="badge unknown">Unknown</span>
+        </div>
+      </main>
+      <div id="modal" class="modal hidden">
+        <div class="modal-content">
+          <button type="button" class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+          <h2 id="modal-title">Facility</h2>
+          <p id="modal-status" class="modal-status"></p>
+          <p id="modal-hours" class="modal-meta"></p>
+          <div class="modal-actions">
+            <p>Report current status:</p>
+            <div class="status-buttons">
+              <button type="button" data-status="open">Open</button>
+              <button type="button" data-status="closed">Closed</button>
+              <button type="button" data-status="in_use">In use</button>
+              <button type="button" data-status="unknown">Unknown</button>
+            </div>
+          </div>
+          <p id="modal-links" class="modal-links"></p>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

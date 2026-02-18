@@ -1,0 +1,22 @@
+{
+  "name": "sports-app",
+  "version": "1.0.0",
+  "description": "Check if sports fields, courts, and tracks are open or in use",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "node server/index.js",
+    "client": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "vite": "^5.0.0"
+  }
+}
