@@ -85,7 +85,7 @@ export function groupFacilities(facilities) {
       const firstName = group[0].name || 'Area';
       const name = group.every((f) => (f.name || '').trim() === (firstName || '').trim())
         ? `${firstName.trim() || 'Area'} (${group.length} fields)`
-        : `${firstName.trim() || 'Area'} & area (${group.length} fields)`;
+        : `${firstName.trim() || 'Area'} and area (${group.length} fields)`;
       items.push({
         type: 'complex',
         id: `complex-${group[0].id}`,

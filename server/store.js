@@ -38,7 +38,7 @@ export function getFacilityById(id) {
 /** Normalized sports for filtering. */
 export const SPORTS = [
   'soccer', 'basketball', 'track_and_field', 'volleyball', 'football',
-  'tennis', 'baseball', 'softball', 'pickleball', 'other'
+  'tennis', 'baseball', 'softball', 'pickleball', 'golf', 'other'
 ];
 
 /** True if the facility name suggests a store/shop/retail rather than a field or court. */
@@ -67,6 +67,7 @@ function inferSport(f) {
   if (n.includes('softball') || n === 'softball') return 'softball';
   if (n.includes('athletics') || n.includes('running') || n.includes('track')) return 'track_and_field';
   if (n.includes('pickleball')) return 'pickleball';
+  if (n.includes('golf')) return 'golf';
   if (f.type === 'court' || f.type === 'field') return 'other';
   return 'other';
 }

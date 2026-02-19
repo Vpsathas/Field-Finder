@@ -6157,9 +6157,9 @@
     "openingHours": null,
     "externalUrl": null,
     "webcamUrl": null,
-    "status": null,
-    "statusUpdatedAt": null,
-    "statusSource": null,
+    "status": "closed",
+    "statusUpdatedAt": "2026-02-19T04:03:48.263Z",
+    "statusSource": "crowdsourced",
     "createdAt": "2026-02-18T20:31:46.053Z"
   },
   {

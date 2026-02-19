@@ -14,6 +14,7 @@ function osmSportToAppSport(osmSport) {
   if (s === 'softball') return 'softball';
   if (s === 'athletics' || s === 'running') return 'track_and_field';
   if (s === 'pickleball') return 'pickleball';
+  if (s === 'golf') return 'golf';
   return SPORTS.includes(s) ? s : 'other';
 }
 

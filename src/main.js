@@ -8,7 +8,7 @@ let facilities = [];
 const statusLabels = {
   open: 'Open',
   closed: 'Closed',
-  in_use: 'In use',
+  in_use: 'In Use',
   unknown: 'Unknown',
 };
 
@@ -29,6 +29,7 @@ const sportLabels = {
   baseball: 'Baseball',
   softball: 'Softball',
   pickleball: 'Pickleball',
+  golf: 'Golf',
   other: 'Other',
 };
 
@@ -43,6 +44,7 @@ const sportIcons = {
   baseball:     { emoji: '⚾', color: '#1e40af' },
   softball:     { emoji: '🥎', color: '#db2777' },
   pickleball:   { emoji: '🏓', color: '#16a34a' },
+  golf:         { emoji: '⛳', color: '#059669' },
   other:        { emoji: '🏟️', color: '#6b7280' },
 };
 
@@ -114,14 +116,16 @@ function escapeHtml(s) {
   return div.innerHTML;
 }
 
-/** Format facility/place names: remove underscores, proper title case. */
+/** Format facility/place names: remove underscores and semicolons, proper title case. */
 function formatDisplayName(name) {
   if (!name || typeof name !== 'string') return name;
   const smallWords = new Set(['and', 'or', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'a', 'an']);
   return name
     .replace(/_/g, ' ')
+    .replace(/;/g, ' and ')
     .trim()
     .split(/\s+/)
+    .filter((w) => w.length > 0)
     .map((word, i) => {
       const lower = word.toLowerCase();
       if (i > 0 && smallWords.has(lower)) return lower;
@@ -167,12 +171,12 @@ function openModal(f) {
   document.getElementById('modal-title').textContent = formatDisplayName(f.name);
   document.getElementById('modal-status').innerHTML = `Status: <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>`;
   document.getElementById('modal-hours').textContent = f.openingHours
-    ? 'Opening hours are used to estimate open/closed when no recent report.'
+    ? 'Opening hours are used to estimate whether this facility is open or closed when there is no recent report.'
     : 'No opening hours set. Report status to help others.';
   document.getElementById('modal-links').innerHTML = [
     f.externalUrl && `<a href="${f.externalUrl}" target="_blank" rel="noopener">Official page</a>`,
-    f.webcamUrl && `<a href="${f.webcamUrl}" target="_blank" rel="noopener">Live view / webcam</a>`,
-  ].filter(Boolean).join(' · ') || 'No links.';
+    f.webcamUrl && `<a href="${f.webcamUrl}" target="_blank" rel="noopener">Live view or webcam</a>`,
+  ].filter(Boolean).join(' & ') || 'No links available.';
   modal.dataset.facilityId = f.id;
   modal.classList.remove('hidden');
   document.querySelectorAll('.modal-content .status-buttons button').forEach((btn) => {
@@ -219,7 +223,7 @@ function reportStatus(id, status) {
       }
       refresh();
     })
-    .catch(() => alert('Failed to report status'));
+    .catch(() => alert('Failed to report status. Please try again.'));
 }
 
 /** Return items that fall within the current map bounds (sidebar and map stay in sync). */
@@ -277,7 +281,7 @@ function init() {
         const { latitude, longitude } = pos.coords;
         fetch(`${API}/discovery/osm?lat=${latitude}&lng=${longitude}&radiusKm=5`)
           .then((r) => {
-            if (!r.ok) throw new Error(r.status === 502 ? 'Map data service unavailable. Try again in a moment.' : 'Discovery failed.');
+            if (!r.ok) throw new Error(r.status === 502 ? 'Map data service is unavailable. Try again in a moment.' : 'Discovery failed.');
             return r.json();
           })
           .then((data) => {
@@ -287,8 +291,8 @@ function init() {
             refresh();
             map.flyTo([latitude, longitude], 14, { duration: 0.8 });
             const n = data.discovered != null ? data.discovered : 0;
-            if (n > 0) alert(`Added ${n} facilities. Map updated.`);
-            else alert('No new facilities in this area. Showing existing pins.');
+            if (n > 0) alert(n === 1 ? 'Added 1 facility. The map has been updated.' : `Added ${n} facilities. The map has been updated.`);
+            else alert('No new facilities in this area. Showing existing facilities on the map.');
           })
           .catch((err) => {
             btn.disabled = false;
@@ -299,7 +303,7 @@ function init() {
       () => {
         btn.disabled = false;
         btn.textContent = 'Discover nearby';
-        alert('Could not get your location. Allow location access and try again.');
+        alert('Could not get your location. Please allow location access and try again.');
       }
     );
   });
