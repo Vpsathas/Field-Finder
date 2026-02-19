@@ -234,26 +234,46 @@ html, body {
 .badge.in_use { background: rgba(210, 153, 34, 0.25); color: var(--in_use); }
 .badge.unknown { background: rgba(110, 118, 129, 0.25); color: var(--unknown); }
 
-/* Red pin markers */
+/* Sport ball icons (single-sport facilities) */
+.marker-sport-wrap {
+  background: none !important;
+  border: none !important;
+}
+
+.marker-sport-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid;
+  background: #fff;
+  font-size: 1.1rem;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Pin for multi-sport complexes */
 .marker-pin-wrap {
   background: none !important;
   border: none !important;
 }
 
-.marker-pin-red {
+.marker-pin-complex {
   position: relative;
   display: block;
   width: 26px;
   height: 38px;
   margin: 0 auto;
-  background: #c0392b;
-  border: 2px solid #922b21;
+  background: #7c3aed;
+  border: 2px solid #5b21b6;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-.marker-pin-red::after {
+.marker-pin-complex::after {
   content: '';
   position: absolute;
   top: 50%;

@@ -32,10 +32,36 @@ const sportLabels = {
   other: 'Other',
 };
 
-function getRedPinIcon() {
+/** Sport → ball/icon emoji and map marker color (single-sport facilities). */
+const sportIcons = {
+  soccer:       { emoji: '⚽', color: '#3b82f6' },
+  basketball:   { emoji: '🏀', color: '#ea580c' },
+  track_and_field: { emoji: '🏃', color: '#0d9488' },
+  volleyball:   { emoji: '🏐', color: '#ca8a04' },
+  football:     { emoji: '🏈', color: '#dc2626' },
+  tennis:       { emoji: '🎾', color: '#65a30d' },
+  baseball:     { emoji: '⚾', color: '#1e40af' },
+  softball:     { emoji: '🥎', color: '#db2777' },
+  pickleball:   { emoji: '🏓', color: '#16a34a' },
+  other:        { emoji: '🏟️', color: '#6b7280' },
+};
+
+function getSportIcon(sport) {
+  const s = sportIcons[sport] || sportIcons.other;
+  const style = `border-color:${s.color};box-shadow:0 0 0 2px ${s.color};`;
+  return L.divIcon({
+    className: 'marker-sport-wrap',
+    html: `<span class="marker-sport-icon" style="${style}" data-emoji="${s.emoji}">${s.emoji}</span>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+}
+
+/** Pin for complexes (multiple sports) – distinct color, keep pin shape. */
+function getComplexPinIcon() {
   return L.divIcon({
     className: 'marker-pin-wrap',
-    html: '<span class="marker-pin-red"></span>',
+    html: '<span class="marker-pin-complex"></span>',
     iconSize: [28, 40],
     iconAnchor: [14, 40],
   });
@@ -100,17 +126,17 @@ function formatDisplayName(name) {
 
 function updateMap(items) {
   markersLayer.clearLayers();
-  const pinIcon = getRedPinIcon();
   items.forEach((item) => {
     if (item.type === 'single') {
       const f = item.facility;
-      const marker = L.marker([f.lat, f.lng], { icon: pinIcon })
+      const sport = f.computedSport || f.sport || 'other';
+      const marker = L.marker([f.lat, f.lng], { icon: getSportIcon(sport) })
         .on('click', () => openModal(f));
       marker.facility = f;
       markersLayer.addLayer(marker);
     } else {
       const c = item;
-      const marker = L.marker([c.lat, c.lng], { icon: pinIcon })
+      const marker = L.marker([c.lat, c.lng], { icon: getComplexPinIcon() })
         .on('click', () => openComplexModal(c));
       marker.complex = c;
       markersLayer.addLayer(marker);
