@@ -89,14 +89,20 @@ function renderList(items) {
         <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>
         <span class="sport">${sportLabels[sport] || formatDisplayName(sport)}</span>
       `;
-      li.addEventListener('click', () => openModal(f));
+      li.addEventListener('click', () => {
+        map.flyTo([f.lat, f.lng], 16, { duration: 0.5 });
+        openModal(f);
+      });
     } else {
       const c = item;
       li.innerHTML = `
         <strong>${escapeHtml(formatDisplayName(c.name))}</strong>
         <span class="sport">${c.facilityCount} fields</span>
       `;
-      li.addEventListener('click', () => openComplexModal(c));
+      li.addEventListener('click', () => {
+        map.flyTo([c.lat, c.lng], 16, { duration: 0.5 });
+        openComplexModal(c);
+      });
     }
     ul.appendChild(li);
   });
@@ -216,12 +222,28 @@ function reportStatus(id, status) {
     .catch(() => alert('Failed to report status'));
 }
 
+/** Return items that fall within the current map bounds (sidebar and map stay in sync). */
+function getItemsInMapView() {
+  if (!map || !facilities.length) return facilities;
+  const bounds = map.getBounds();
+  return facilities.filter((item) => {
+    const lat = item.type === 'single' ? item.facility.lat : item.lat;
+    const lng = item.type === 'single' ? item.facility.lng : item.lng;
+    return bounds.contains([lat, lng]);
+  });
+}
+
+function refreshView() {
+  const inView = getItemsInMapView();
+  renderList(inView);
+  updateMap(inView);
+}
+
 function refresh() {
   const sport = document.getElementById('filter-sport').value;
   fetchFacilities(sport).then((data) => {
     facilities = data;
-    renderList(data);
-    updateMap(data);
+    refreshView();
   });
 }
 
@@ -233,6 +255,7 @@ function initMap() {
     maxZoom: 20,
   }).addTo(map);
   markersLayer.addTo(map);
+  map.on('moveend', refreshView);
 }
 
 function init() {

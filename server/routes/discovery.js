@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllFacilities, addFacility, SPORTS } from '../store.js';
+import { getAllFacilities, addFacility, SPORTS, isStore } from '../store.js';
 
 function osmSportToAppSport(osmSport) {
   if (!osmSport) return 'other';
@@ -77,6 +77,7 @@ discoveryRouter.get('/osm', async (req, res) => {
       const rawSport = el.tags?.sport;
       const sport = osmSportToAppSport(rawSport);
       const name = el.tags?.name || (typeof rawSport === 'string' ? rawSport.replace(/_/g, ' ') : 'Sports facility');
+      if (isStore(name)) continue;
       const created = addFacility({
         name,
         type: 'field',

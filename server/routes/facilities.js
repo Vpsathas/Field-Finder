@@ -5,6 +5,7 @@ import {
   addFacility,
   computeStatus,
   getSport,
+  isStore,
 } from '../store.js';
 import { groupFacilities } from '../groupFacilities.js';
 
@@ -13,15 +14,17 @@ export const facilitiesRouter = Router();
 facilitiesRouter.get('/', (req, res) => {
   const sport = req.query.sport;
   const flat = req.query.flat === 'true';
-  let list = getAllFacilities().map((f) => {
-    const computedSport = getSport(f);
-    return {
-      ...f,
-      sport: f.sport ?? computedSport,
-      computedSport,
-      computedStatus: computeStatus(f),
-    };
-  });
+  let list = getAllFacilities()
+    .filter((f) => !isStore(f.name))
+    .map((f) => {
+      const computedSport = getSport(f);
+      return {
+        ...f,
+        sport: f.sport ?? computedSport,
+        computedSport,
+        computedStatus: computeStatus(f),
+      };
+    });
   if (sport) list = list.filter((f) => (f.computedSport || f.sport) === sport);
   if (flat) {
     res.json(list);
@@ -33,7 +36,7 @@ facilitiesRouter.get('/', (req, res) => {
 
 facilitiesRouter.get('/:id', (req, res) => {
   const f = getFacilityById(req.params.id);
-  if (!f) return res.status(404).json({ error: 'Not found' });
+  if (!f || isStore(f.name)) return res.status(404).json({ error: 'Not found' });
   const computedSport = getSport(f);
   res.json({
     ...f,

@@ -41,6 +41,19 @@ export const SPORTS = [
   'tennis', 'baseball', 'softball', 'pickleball', 'other'
 ];
 
+/** True if the facility name suggests a store/shop/retail rather than a field or court. */
+export function isStore(name) {
+  if (!name || typeof name !== 'string') return false;
+  const n = name.toLowerCase().trim();
+  if (!n) return true;
+  if (/\bshop\b|\bstore\b|\bretail\b|\boutlet\b|\bwear\b|\bapparel\b/.test(n)) return true;
+  if (/\bpilates\b|\bbarre\b|\bskate\s*shop\b|\bfleet\s*feet\b/.test(n)) return true;
+  if (/\byoga\b/.test(n) && !/\b(park|centre|center|field|complex)\b/.test(n)) return true;
+  if (/\bchess\b/.test(n)) return true;
+  if (/^(fitness|yoga|chess)$/.test(n)) return true;
+  return false;
+}
+
 function inferSport(f) {
   if (f.sport && SPORTS.includes(f.sport)) return f.sport;
   if (f.type === 'track') return 'track_and_field';
