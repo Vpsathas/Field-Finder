@@ -59,15 +59,15 @@ function renderList(items) {
       const status = f.computedStatus || f.status || 'unknown';
       const sport = f.computedSport || f.sport || 'other';
       li.innerHTML = `
-        <strong>${escapeHtml(f.name)}</strong>
+        <strong>${escapeHtml(formatDisplayName(f.name))}</strong>
         <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>
-        <span class="sport">${sportLabels[sport] || sport}</span>
+        <span class="sport">${sportLabels[sport] || formatDisplayName(sport)}</span>
       `;
       li.addEventListener('click', () => openModal(f));
     } else {
       const c = item;
       li.innerHTML = `
-        <strong>${escapeHtml(c.name)}</strong>
+        <strong>${escapeHtml(formatDisplayName(c.name))}</strong>
         <span class="sport">${c.facilityCount} fields</span>
       `;
       li.addEventListener('click', () => openComplexModal(c));
@@ -80,6 +80,22 @@ function escapeHtml(s) {
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
+}
+
+/** Format facility/place names: remove underscores, proper title case. */
+function formatDisplayName(name) {
+  if (!name || typeof name !== 'string') return name;
+  const smallWords = new Set(['and', 'or', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'a', 'an']);
+  return name
+    .replace(/_/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .map((word, i) => {
+      const lower = word.toLowerCase();
+      if (i > 0 && smallWords.has(lower)) return lower;
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
 }
 
 function updateMap(items) {
@@ -116,7 +132,7 @@ function openModal(f) {
   const modal = document.getElementById('modal');
   showSingleModal();
   const status = f.computedStatus || f.status || 'unknown';
-  document.getElementById('modal-title').textContent = f.name;
+  document.getElementById('modal-title').textContent = formatDisplayName(f.name);
   document.getElementById('modal-status').innerHTML = `Status: <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>`;
   document.getElementById('modal-hours').textContent = f.openingHours
     ? 'Opening hours are used to estimate open/closed when no recent report.'
@@ -135,7 +151,7 @@ function openModal(f) {
 function openComplexModal(complex) {
   const modal = document.getElementById('modal');
   showComplexModal();
-  document.getElementById('modal-complex-title').textContent = complex.name;
+  document.getElementById('modal-complex-title').textContent = formatDisplayName(complex.name);
   const listEl = document.getElementById('modal-complex-list');
   listEl.innerHTML = '';
   complex.facilities.forEach((f) => {
@@ -144,9 +160,9 @@ function openComplexModal(complex) {
     const li = document.createElement('li');
     li.className = 'modal-complex-item';
     li.innerHTML = `
-      <strong>${escapeHtml(f.name)}</strong>
+      <strong>${escapeHtml(formatDisplayName(f.name))}</strong>
       <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>
-      <span class="sport">${sportLabels[sport] || sport}</span>
+      <span class="sport">${sportLabels[sport] || formatDisplayName(sport)}</span>
     `;
     li.addEventListener('click', () => {
       openModal(f);
