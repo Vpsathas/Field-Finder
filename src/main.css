@@ -48,6 +48,7 @@ html, body {
   padding: 1rem 1.5rem;
   background: var(--surface);
   border-bottom: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
 }
 
 .header h1 {
@@ -119,13 +120,6 @@ html, body {
   background: var(--bg);
   border-radius: var(--radius);
   border: 1px dashed rgba(255, 255, 255, 0.12);
-}
-
-.discover p {
-  margin: 0 0 0.625rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--muted);
 }
 
 #btn-discover {
