@@ -76,6 +76,24 @@ export function getSport(facility) {
   return inferSport(facility);
 }
 
+/** Known name patterns → official or finder URL when facility has no externalUrl. */
+const SUGGESTED_WEBSITES = [
+  { pattern: /ymca/i, url: 'https://www.ymca.org/find-your-y' },
+  { pattern: /la fitness/i, url: 'https://www.lafitness.com/pages/clubfinder.aspx' },
+  { pattern: /planet fitness/i, url: 'https://www.planetfitness.com/locations' },
+  { pattern: /recreation center|rec center|community center/i, url: null },
+  { pattern: /city of .* parks|parks and recreation/i, url: null },
+];
+
+export function getSuggestedWebsite(name) {
+  if (!name || typeof name !== 'string') return null;
+  const n = name.trim();
+  for (const { pattern, url } of SUGGESTED_WEBSITES) {
+    if (pattern.test(n) && url) return url;
+  }
+  return null;
+}
+
 export function addFacility(facility) {
   const id = String(Date.now()) + Math.random().toString(36).slice(2, 8);
   const sport = facility.sport && SPORTS.includes(facility.sport) ? facility.sport : inferSport({ ...facility, name: facility.name || '', type: facility.type });
@@ -89,6 +107,7 @@ export function addFacility(facility) {
     openingHours: facility.openingHours || null,
     externalUrl: facility.externalUrl || null,
     webcamUrl: facility.webcamUrl || null,
+    description: facility.description || null,
     status: null,
     statusUpdatedAt: null,
     statusSource: null,

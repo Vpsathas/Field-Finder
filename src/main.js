@@ -33,6 +33,47 @@ const sportLabels = {
   other: 'Other',
 };
 
+/** Short description by sport when facility has no description. */
+const defaultDescriptions = {
+  soccer: 'Public soccer field.',
+  basketball: 'Public basketball court.',
+  track_and_field: 'Running track or athletics facility.',
+  volleyball: 'Volleyball court.',
+  football: 'Football field.',
+  tennis: 'Tennis courts.',
+  baseball: 'Baseball field.',
+  softball: 'Softball field.',
+  pickleball: 'Pickleball court.',
+  golf: 'Golf course or driving range.',
+  other: 'Sports facility.',
+};
+
+/** Known name patterns → short description (e.g. YMCA, rec centers). */
+const knownDescriptions = [
+  { pattern: /ymca/i, text: 'Community organization offering gyms, pools, courts, and sports programs.' },
+  { pattern: /la fitness/i, text: 'Gym chain with cardio, weights, and group fitness.' },
+  { pattern: /planet fitness/i, text: 'Gym chain with cardio and strength equipment.' },
+  { pattern: /recreation center|rec center|community center/i, text: 'Public recreation facility with courts, gyms, or pools.' },
+  { pattern: /parks?\s+and\s+rec|parks?\s+&\s+rec/i, text: 'Municipal parks and recreation facility.' },
+];
+
+function getDescriptionForName(name) {
+  if (!name || typeof name !== 'string') return null;
+  const n = name.trim();
+  for (const { pattern, text } of knownDescriptions) {
+    if (pattern.test(n)) return text;
+  }
+  return null;
+}
+
+function getFacilityDescription(f) {
+  if (f.description && f.description.trim()) return f.description.trim();
+  const byName = getDescriptionForName(f.name);
+  if (byName) return byName;
+  const sport = f.computedSport || f.sport || 'other';
+  return defaultDescriptions[sport] || defaultDescriptions.other;
+}
+
 /** Sport → ball/icon emoji and map marker color (single-sport facilities). */
 const sportIcons = {
   soccer:       { emoji: '⚽', color: '#3b82f6' },
@@ -116,7 +157,7 @@ function escapeHtml(s) {
   return div.innerHTML;
 }
 
-/** Format facility/place names: remove underscores and semicolons, proper title case. */
+/** Format facility/place names: remove underscores and semicolons, normalize spacing, proper title case. */
 function formatDisplayName(name) {
   if (!name || typeof name !== 'string') return name;
   const smallWords = new Set(['and', 'or', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'a', 'an']);
@@ -124,6 +165,7 @@ function formatDisplayName(name) {
     .replace(/_/g, ' ')
     .replace(/;/g, ' and ')
     .trim()
+    .replace(/\s+/g, ' ')
     .split(/\s+/)
     .filter((w) => w.length > 0)
     .map((word, i) => {
@@ -169,14 +211,18 @@ function openModal(f) {
   showSingleModal();
   const status = f.computedStatus || f.status || 'unknown';
   document.getElementById('modal-title').textContent = formatDisplayName(f.name);
+  const descEl = document.getElementById('modal-description');
+  descEl.textContent = getFacilityDescription(f);
+  descEl.hidden = false;
   document.getElementById('modal-status').innerHTML = `Status: <span class="badge ${statusClass[status]}">${statusLabels[status]}</span>`;
   document.getElementById('modal-hours').textContent = f.openingHours
     ? 'Opening hours are used to estimate whether this facility is open or closed when there is no recent report.'
     : 'No opening hours set. Report status to help others.';
-  document.getElementById('modal-links').innerHTML = [
-    f.externalUrl && `<a href="${f.externalUrl}" target="_blank" rel="noopener">Official page</a>`,
+  const linkParts = [
+    f.externalUrl && `<a href="${f.externalUrl}" target="_blank" rel="noopener">Website</a>`,
     f.webcamUrl && `<a href="${f.webcamUrl}" target="_blank" rel="noopener">Live view or webcam</a>`,
-  ].filter(Boolean).join(' & ') || 'No links available.';
+  ].filter(Boolean);
+  document.getElementById('modal-links').innerHTML = linkParts.length ? linkParts.join(' & ') : 'No website available.';
   modal.dataset.facilityId = f.id;
   modal.classList.remove('hidden');
   document.querySelectorAll('.modal-content .status-buttons button').forEach((btn) => {

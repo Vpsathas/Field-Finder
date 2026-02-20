@@ -79,13 +79,18 @@ discoveryRouter.get('/osm', async (req, res) => {
       const sport = osmSportToAppSport(rawSport);
       const name = el.tags?.name || (typeof rawSport === 'string' ? rawSport.replace(/_/g, ' ') : 'Sports facility');
       if (isStore(name)) continue;
+      const tags = el.tags || {};
+      const externalUrl = tags.website || tags['contact:website'] || tags.url || null;
+      const description = tags.description || null;
       const created = addFacility({
         name,
         type: 'field',
         sport,
         lat: latEl,
         lng: lonEl,
-        openingHours: el.tags?.opening_hours ? parseOpeningHours(el.tags.opening_hours) : null,
+        openingHours: tags.opening_hours ? parseOpeningHours(tags.opening_hours) : null,
+        externalUrl: externalUrl || undefined,
+        description: description || undefined,
       });
       newOnes.push(created);
     }

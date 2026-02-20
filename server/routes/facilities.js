@@ -6,6 +6,7 @@ import {
   computeStatus,
   getSport,
   isStore,
+  getSuggestedWebsite,
 } from '../store.js';
 import { groupFacilities } from '../groupFacilities.js';
 
@@ -23,6 +24,7 @@ facilitiesRouter.get('/', (req, res) => {
         sport: f.sport ?? computedSport,
         computedSport,
         computedStatus: computeStatus(f),
+        externalUrl: f.externalUrl || getSuggestedWebsite(f.name) || null,
       };
     });
   if (sport) list = list.filter((f) => (f.computedSport || f.sport) === sport);
@@ -43,11 +45,12 @@ facilitiesRouter.get('/:id', (req, res) => {
     sport: f.sport ?? computedSport,
     computedSport,
     computedStatus: computeStatus(f),
+    externalUrl: f.externalUrl || getSuggestedWebsite(f.name) || null,
   });
 });
 
 facilitiesRouter.post('/', (req, res) => {
-  const { name, type, sport, lat, lng, openingHours, externalUrl, webcamUrl } = req.body;
+  const { name, type, sport, lat, lng, openingHours, externalUrl, webcamUrl, description } = req.body;
   if (lat == null || lng == null) {
     return res.status(400).json({ error: 'lat and lng required' });
   }
@@ -60,6 +63,7 @@ facilitiesRouter.post('/', (req, res) => {
     openingHours,
     externalUrl,
     webcamUrl,
+    description,
   });
   res.status(201).json(created);
 });

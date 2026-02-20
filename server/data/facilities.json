@@ -539,7 +539,7 @@
   },
   {
     "id": "1771015941754savnwf",
-    "name": "Yoga Hom",
+    "name": "Yoga Home",
     "type": "field",
     "lat": 30.2658766,
     "lng": -97.7438805,
@@ -722,7 +722,7 @@
   },
   {
     "id": "1771015941757nbsnkb",
-    "name": "Zilker Park Sand Vollyball Courts",
+    "name": "Zilker Park Sand Volleyball Courts",
     "type": "field",
     "lat": 30.2688061,
     "lng": -97.7684504,
@@ -3935,9 +3935,9 @@
     "openingHours": null,
     "externalUrl": null,
     "webcamUrl": null,
-    "status": null,
-    "statusUpdatedAt": null,
-    "statusSource": null,
+    "status": "open",
+    "statusUpdatedAt": "2026-02-20T20:24:10.216Z",
+    "statusSource": "crowdsourced",
     "createdAt": "2026-02-13T20:52:21.818Z"
   },
   {
@@ -4598,7 +4598,7 @@
   },
   {
     "id": "1771446706001aj90mw",
-    "name": "Medrano Reyna Besball Field",
+    "name": "Medrano Reyna Baseball Field",
     "type": "field",
     "sport": "baseball",
     "lat": 30.2430219,
