@@ -119,6 +119,7 @@ async function fetchFacilities(sport = '') {
 
 function renderList(items) {
   const ul = document.getElementById('facility-list');
+  const emptyEl = document.getElementById('facility-list-empty');
   ul.innerHTML = '';
   items.forEach((item) => {
     const li = document.createElement('li');
@@ -149,6 +150,9 @@ function renderList(items) {
     }
     ul.appendChild(li);
   });
+  if (emptyEl) {
+    emptyEl.classList.toggle('hidden', items.length > 0);
+  }
 }
 
 function escapeHtml(s) {
@@ -314,44 +318,48 @@ function init() {
 
   document.getElementById('filter-sport').addEventListener('change', refresh);
 
-  document.getElementById('btn-discover').addEventListener('click', () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation not supported');
-      return;
-    }
-    const btn = document.getElementById('btn-discover');
-    btn.disabled = true;
-    btn.textContent = 'Searching…';
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        fetch(`${API}/discovery/osm?lat=${latitude}&lng=${longitude}&radiusKm=5`)
-          .then((r) => {
-            if (!r.ok) throw new Error(r.status === 502 ? 'Map data service is unavailable. Try again in a moment.' : 'Discovery failed.');
-            return r.json();
-          })
-          .then((data) => {
-            btn.disabled = false;
-            btn.textContent = 'Discover nearby';
-            document.getElementById('filter-sport').value = '';
-            refresh();
-            map.flyTo([latitude, longitude], 14, { duration: 0.8 });
-            const n = data.discovered != null ? data.discovered : 0;
-            if (n > 0) alert(n === 1 ? 'Added 1 facility. The map has been updated.' : `Added ${n} facilities. The map has been updated.`);
-            else alert('No new facilities in this area. Showing existing facilities on the map.');
-          })
-          .catch((err) => {
-            btn.disabled = false;
-            btn.textContent = 'Discover nearby';
-            alert(err.message || 'Discovery failed. Try again.');
-          });
-      },
-      () => {
-        btn.disabled = false;
-        btn.textContent = 'Discover nearby';
-        alert('Could not get your location. Please allow location access and try again.');
+  function setDiscoverButtons(disabled, text) {
+    document.querySelectorAll('.btn-discover-any').forEach((b) => {
+      b.disabled = disabled;
+      b.textContent = text;
+    });
+  }
+
+  document.querySelectorAll('.btn-discover-any').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!navigator.geolocation) {
+        alert('Geolocation not supported');
+        return;
       }
-    );
+      setDiscoverButtons(true, 'Searching…');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          fetch(`${API}/discovery/osm?lat=${latitude}&lng=${longitude}&radiusKm=5`)
+            .then((r) => {
+              if (!r.ok) throw new Error(r.status === 502 ? 'Map data service is unavailable. Try again in a moment.' : 'Discovery failed.');
+              return r.json();
+            })
+            .then((data) => {
+              setDiscoverButtons(false, 'Discover nearby');
+              document.getElementById('filter-sport').value = '';
+              refresh();
+              map.flyTo([latitude, longitude], 14, { duration: 0.8 });
+              const n = data.discovered != null ? data.discovered : 0;
+              if (n > 0) alert(n === 1 ? 'Added 1 facility. The map has been updated.' : `Added ${n} facilities. The map has been updated.`);
+              else alert('No new facilities in this area. Showing existing facilities on the map.');
+            })
+            .catch((err) => {
+              setDiscoverButtons(false, 'Discover nearby');
+              alert(err.message || 'Discovery failed. Try again.');
+            });
+        },
+        () => {
+          setDiscoverButtons(false, 'Discover nearby');
+          alert('Could not get your location. Please allow location access and try again.');
+        }
+      );
+    });
   });
 
   document.getElementById('modal-close').addEventListener('click', () => {

@@ -12,32 +12,37 @@
   </head>
   <body>
     <div id="app">
-      <header class="header">
-        <h1>Field Finder</h1>
-        <p class="tagline">Find a field near you.</p>
-      </header>
       <aside class="sidebar">
-        <div class="filters">
-          <label>Sport</label>
-          <select id="filter-sport">
-            <option value="">All sports</option>
-            <option value="soccer">Soccer</option>
-            <option value="basketball">Basketball</option>
-            <option value="track_and_field">Track and field</option>
-            <option value="volleyball">Volleyball</option>
-            <option value="football">Football</option>
-            <option value="tennis">Tennis</option>
-            <option value="baseball">Baseball</option>
-            <option value="softball">Softball</option>
-            <option value="pickleball">Pickleball</option>
-            <option value="golf">Golf</option>
-            <option value="other">Other</option>
-          </select>
+        <header class="sidebar-header">
+          <h1 class="sidebar-title">Field Finder</h1>
+          <p class="sidebar-tagline">Find a field near you.</p>
+        </header>
+        <div class="sidebar-toolbar">
+          <div class="filters">
+            <label for="filter-sport" class="visually-hidden">Sport</label>
+            <select id="filter-sport" aria-label="Filter by sport">
+              <option value="">All sports</option>
+              <option value="soccer">Soccer</option>
+              <option value="basketball">Basketball</option>
+              <option value="track_and_field">Track and field</option>
+              <option value="volleyball">Volleyball</option>
+              <option value="football">Football</option>
+              <option value="tennis">Tennis</option>
+              <option value="baseball">Baseball</option>
+              <option value="softball">Softball</option>
+              <option value="pickleball">Pickleball</option>
+              <option value="golf">Golf</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
         </div>
         <div class="discover">
-          <button type="button" id="btn-discover">Discover nearby</button>
+          <button type="button" id="btn-discover" class="btn-discover btn-discover-any">Discover nearby</button>
         </div>
-        <ul id="facility-list" class="facility-list"></ul>
+        <div class="facility-list-wrap">
+          <ul id="facility-list" class="facility-list"></ul>
+          <p id="facility-list-empty" class="list-empty hidden">No facilities in this view. Pan the map or tap “Discover nearby” to add more.</p>
+        </div>
       </aside>
       <main class="map-container">
         <div id="map"></div>
